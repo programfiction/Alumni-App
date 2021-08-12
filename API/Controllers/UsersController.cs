@@ -73,13 +73,13 @@ namespace API.Controllers
         {
             var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 
-            var result = await _photoService.AddPhotoAsync(file);
+            ImageUploadResult result = await _photoService.AddPhotoAsync(file);
 
-            if (result.Error != null) return BadRequest(result.Error.Message);
+            // if (result.Error != null) return BadRequest(result.Error.Message);
 
             var photo = new Photo
             {
-                Url = result.SecureUrl.AbsoluteUri,
+                Url = result.fileName,
                 PublicId = result.PublicId
             };
 
@@ -131,7 +131,7 @@ namespace API.Controllers
             if (photo.PublicId != null)
             {
                 var result = await _photoService.DeletePhotoAsync(photo.PublicId);
-                if (result.Error != null) return BadRequest(result.Error.Message);
+                if (result.PublicId == null) return BadRequest("Not able to Delete");
             }
 
             user.Photos.Remove(photo);

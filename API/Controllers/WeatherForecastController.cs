@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
 
 namespace API.Controllers
 {
@@ -20,9 +22,11 @@ namespace API.Controllers
 
         // The Web API will only accept tokens 1) for users, and 2) having the access_as_user scope for this API
         static readonly string[] scopeRequiredByApi = new string[] { "access_as_user" };
+        public IWebHostEnvironment _env { get; }
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IWebHostEnvironment env)
         {
+            _env = env;
             _logger = logger;
         }
 
@@ -38,5 +42,14 @@ namespace API.Controllers
             })
             .ToArray();
         }
+
+        [HttpGet("photo/{filename}")]
+        public ActionResult GetPhoto(string fileName)
+        {
+            string path= Path.Combine(_env.ContentRootPath,"demoImages")+$@"\{fileName}";
+            byte[] b= System.IO.File.ReadAllBytes(path);
+            return File(b,"image/jpeg","image/png");
+        }
+
     }
 }
